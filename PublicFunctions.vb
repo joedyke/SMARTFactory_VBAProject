@@ -234,3 +234,56 @@ Function CreateCumulativePlan()
     Set rs = Nothing
     
 End Function
+
+
+'This function compacts a specified database.
+'Note the database cannot be open for this function to be successful
+'If the database is open an error will be stored and the routine will close
+Public Sub CompactDb()
+On Error GoTo CompactDb_Err
+    Dim path2 As String
+    Dim objAccess As Object 'database object (connection)
+    Dim objDAO As Object
+    
+    path2 = Replace(path_DB, ".accde", "_temp.accde")
+    
+    Set objDAO = CreateObject("DAO.DBEngine.120")
+    objDAO.CompactDataBase path_DB, path2
+    
+    Set objDAO = Nothing
+    
+    Kill path_DB
+    Name path2 As path_DB
+ 
+CompactDb_Exit:
+    Set objDAO = Nothing
+    Exit Sub
+
+CompactDb_Err:
+    Call LogErrorDesc(Error$, "CompactDB")
+    Resume CompactDb_Exit
+
+End Sub
+
+'Logs the error description, time, and function or sub that the error occured in
+Public Function LogErrorDesc(ErrTxt As String, ErrLoc As String)
+    Dim ws  As Worksheet
+    Dim element As Variant
+    Dim row As Integer
+    Set ws = Sheets("Error_Log")
+               
+    row = ws.Cells.Find(What:="*", _
+                        After:=Range("A1"), _
+                        LookAt:=xlPart, _
+                        LookIn:=xlFormulas, _
+                        SearchOrder:=xlByRows, _
+                        SearchDirection:=xlPrevious, _
+                        MatchCase:=False).row + 1
+                
+    
+    ws.Cells(row, 1).value = Now
+    ws.Cells(row, 2).value = ErrTxt
+    ws.Cells(row, 3).value = ErrLoc
+    
+    Set ws = Nothing
+End Function
