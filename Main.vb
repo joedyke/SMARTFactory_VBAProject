@@ -18,25 +18,32 @@ Public Sub mainprocedure()
     Dim cnn As Object 'database object (connection)
     Dim sql As String
     
+    
+    
     Set cnn = CreateObject("ADODB.Connection")
     
     Dim TeamNames(1 To 2) As String
     TeamNames(1) = "HUMS"
     TeamNames(2) = "Computers"
+    'TeamNames(3) = "MISSILES"
     
     Set dictLastRefresh = CreateObject("Scripting.Dictionary")
     
     PauseTime = 5 'seconds to pause between loops
     
-    'Loop to exit if after 4:00 pm
+    
+
+    'Loop to exit if after 5:00 pm
     'loops over all data files and runs the VBA project if
     'the files are new
     'always runs at least once
-    Do While timer < 57600 'exit loop after 4:00 pm
+    Do While timer < 61200 'exit loop after 5:00 pm
         For Each element In TeamNames
             'set DB path
             path_DB = Replace(ActiveWorkbook.path, "Administrator", "") & element & "\" & element & "Dashboard.accde"
-        
+            
+
+            
             'Set DataFolder
             DataFolder = Replace(ActiveWorkbook.path, "Administrator", "") & element & "\Data\"
         
@@ -111,6 +118,13 @@ Public Sub mainprocedure()
         Next
     Loop
     
+    'Compact each database at the end of each day
+    'all databases should be closed.
+    For Each element In TeamNames
+            'set DB path
+            path_DB = Replace(ActiveWorkbook.path, "Administrator", "") & element & "\" & element & "Dashboard.accde"
+            Call CompactDb
+    Next
     
     'Close last refresh object
     Set dictLastRefresh = Nothing
